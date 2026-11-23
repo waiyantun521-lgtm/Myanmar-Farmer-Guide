@@ -4,7 +4,7 @@ import { CropGuideView } from "./components/CropGuideView";
 import { FertilizerCalculatorView } from "./components/FertilizerCalculatorView";
 import { OrganicFertilizerView } from "./components/OrganicFertilizerView";
 import { PestGuideView, type PestSectionMode } from "./components/PestGuideView";
-import { OfflineIndicator, PWAInstallBanner } from "./components/PWAInstallBanner";
+import { OfflineIndicator } from "./components/PWAInstallBanner";
 import { SoilAnalyzerView } from "./components/SoilAnalyzerView";
 import type {
   AppTab,
@@ -172,7 +172,6 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 pb-24 md:pb-12">
         <OfflineIndicator />
-        <PWAInstallBanner />
         {activeTab === "soil" && (
           <SoilAnalyzerView
             onApplySoilToCalculator={handleApplySoilToCalculator}
