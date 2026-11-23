@@ -1,0 +1,103 @@
+
+export default {
+  async fetch(request, env) {
+    const cors = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type"
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: cors });
+    }
+
+    if (request.method !== "POST") {
+      return new Response("Use POST", {
+        status: 405,
+        headers: cors
+      });
+    }
+
+    if (!env.GEMINI_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "GEMINI_API_KEY မထည့်ရသေးပါ" }),
+        {
+          status: 500,
+          headers: { ...cors, "Content-Type": "application/json" }
+        }
+      );
+    }
+
+    try {
+      const body = await request.json();
+
+      if (!body.imageBase64) {
+        return new Response(
+          JSON.stringify({ error: "ပုံမပါလာပါ" }),
+          {
+            status: 400,
+            headers: { ...cors, "Content-Type": "application/json" }
+          }
+        );
+      }
+
+      const prompt = `မြန်မာတောင်သူများအတွက် စိုက်ပျိုးရေးပညာရှင်အဖြစ် ဖြေပါ။
+ဤမြေဓာတ်ပုံကို ကြည့်ပြီး မြန်မာဘာသာဖြင့် ဖြေပါ။
+၁။ ဖြစ်နိုင်သော မြေအမျိုးအစား
+၂။ ဓာတ်ပုံထဲတွင် မြင်ရသော လက္ခဏာများ
+၃။ သင့်တော်နိုင်သော သီးနှံများ
+၄။ မြေပြုပြင်ရန် အကြံပြုချက်
+၅။ ယုံကြည်မှုအဆင့်
+ဓာတ်ပုံတစ်ပုံတည်းဖြင့် pH၊ NPK နှင့် ဆားဓာတ်ပမာဏကို အတိအကျ မသတ်မှတ်နိုင်ကြောင်း ရှင်းပြပါ။`;
+
+      const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": env.GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                {
+                  inline_data: {
+                    mime_type: body.mimeType || "image/jpeg",
+                    data: body.imageBase64
+                  }
+                }
+              ]
+            }]
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return new Response(JSON.stringify(result), {
+          status: response.status,
+          headers: { ...cors, "Content-Type": "application/json" }
+        });
+      }
+
+      const answer = result.candidates?.[0]?.content?.parts
+        ?.map(p => p.text || "").join("\n") || "AI အဖြေမရပါ";
+
+      return new Response(JSON.stringify({ answer }), {
+        headers: { ...cors, "Content-Type": "application/json" }
+      });
+
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ error: String(error) }),
+        {
+          status: 500,
+          headers: { ...cors, "Content-Type": "application/json" }
+        }
+      );
+    }
+  }
+};
