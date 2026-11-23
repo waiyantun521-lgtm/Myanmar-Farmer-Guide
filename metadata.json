@@ -1,0 +1,6 @@
+{
+  "name": "မြေယာမိတ်ဆွေ (Myanma Farm Friend)",
+  "description": "မြန်မာတောင်သူလယ်သမားများအတွက် Gemini AI မြေအမျိုးအစားခန့်မှန်းခြင်း၊ သီးနှံအကြံပြုခြင်း၊ သဘာဝမြေဩဇာပြုလုပ်နည်း၊ တစ်ဧကမြေဩဇာတွက်ချက်စက်နှင့် ပိုးမွှားရောဂါကာကွယ်နည်းလမ်းညွှန် App",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
